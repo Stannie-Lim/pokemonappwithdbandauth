@@ -9,6 +9,8 @@ import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "./AuthForm";
 import User from "./User";
 
+import UserContext from "./UserContext";
+
 function App() {
   const [user, setUser] = useState(null);
 
@@ -118,25 +120,24 @@ function App() {
 
   return (
     <>
-      <Routes>
-        {user ? (
-          <Route
-            path="/homepage"
-            element={<User user={user} logout={logout} />}
-          />
-        ) : (
-          <>
-            <Route
-              path="/login"
-              element={<AuthForm onAuthFormSubmit={login} />}
-            />
-            <Route
-              path="/register"
-              element={<AuthForm onAuthFormSubmit={register} />}
-            />
-          </>
-        )}
-      </Routes>
+      <UserContext.Provider value={user}>
+        <Routes>
+          {user ? (
+            <Route path="/homepage" element={<User logout={logout} />} />
+          ) : (
+            <>
+              <Route
+                path="/login"
+                element={<AuthForm onAuthFormSubmit={login} />}
+              />
+              <Route
+                path="/register"
+                element={<AuthForm onAuthFormSubmit={register} />}
+              />
+            </>
+          )}
+        </Routes>
+      </UserContext.Provider>
     </>
   );
 }

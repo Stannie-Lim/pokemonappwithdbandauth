@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
+const socketio = require("socket.io");
 const jwt = require("jsonwebtoken");
 
 const prisma = new PrismaClient();
@@ -127,4 +128,65 @@ app.get("/api/auth/me", async (req, res, next) => {
   res.send(user);
 });
 
-app.listen(3000);
+// app.listen returns the server that you just created
+// we use this server to create a socketio server
+const server = app.listen(3000);
+
+const io = new socketio.Server(server, {
+  cors: {
+    // only accept socket requests from localhost:5173
+    origin: "http://localhost:5173",
+  },
+});
+
+let loggedInUsers = [];
+const allMessages = [];
+
+io.on("connection", (socket) => {
+  io.to(socket.id).emit("receive_message", allMessages);
+
+  socket.on("user_joined", (user) => {
+    loggedInUsers.push({ socketId: socket.id, user });
+
+    io.emit("all_users", loggedInUsers);
+  });
+
+  socket.on("disconnect", () => {
+    // disconnect means like when user logs out, or disconnects from the socket server
+    // this is why refreshing browser counts as a "disconnect"
+
+    loggedInUsers = loggedInUsers.filter((user) => user.socketId !== socket.id);
+
+    io.emit("all_users", loggedInUsers);
+  });
+
+  /*
+  socket.emit("send_message", {
+      fromUser: user.id,
+      toUser: selectedUserToChatWith.user.id,
+      message,
+    });*/
+
+  socket.on("send_message", ({ fromUser, toUser, message }) => {
+    allMessages.push({ fromUser, toUser, message });
+
+    // we want to send this message ONLY to the toUser
+    // we need their socketId
+    // how do we get their socketId?
+
+    // these 3 sections just sends the message to the people that should be receiving it
+    // aka the receiver
+    // and the sender
+
+    // just finds the socket Id of the receiving user
+    const toUserSocketId = loggedInUsers.find(
+      (user) => user.user.id === toUser
+    ).socketId;
+
+    // sends alls messages to the receiving user
+    io.to(toUserSocketId).emit("receive_message", allMessages);
+
+    // sends all messages to sending user
+    io.to(socket.id).emit("receive_message", allMessages);
+  });
+});
