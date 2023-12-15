@@ -46,7 +46,7 @@ const User = ({ user, logout }) => {
   useEffect(() => {
     const getData = async () => {
       const response = await axios.get(
-        "http://localhost:3000/api/user/my_pokemon",
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/my_pokemon`,
         {
           headers: {
             authorization: window.localStorage.getItem("token"),
@@ -66,7 +66,7 @@ const User = ({ user, logout }) => {
     event.preventDefault();
 
     const response = await axios.post(
-      "http://localhost:3000/api/user/catch_pokemon",
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/catch_pokemon`,
       {
         pokemon,
       },
@@ -117,7 +117,7 @@ function App() {
 
       if (token) {
         const userResponse = await axios.get(
-          "http://localhost:3000/api/auth/me",
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
           {
             headers: {
               authorization: token,
@@ -139,7 +139,7 @@ function App() {
   const login = async (username, password) => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
         {
           username,
           password,
@@ -151,7 +151,7 @@ function App() {
       window.localStorage.setItem("token", token);
 
       const userResponse = await axios.get(
-        "http://localhost:3000/api/auth/me",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
         {
           headers: {
             authorization: token,
@@ -175,7 +175,7 @@ function App() {
       // why are we using axios post?
 
       const response = await axios.post(
-        "http://localhost:3000/api/auth/register",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/register`,
         {
           username,
           password,
@@ -187,7 +187,7 @@ function App() {
       window.localStorage.setItem("token", token);
 
       const userResponse = await axios.get(
-        "http://localhost:3000/api/auth/me",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
         {
           headers: {
             authorization: token,
