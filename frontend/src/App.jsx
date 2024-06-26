@@ -49,7 +49,7 @@ const User = ({ user, logout }) => {
         `${import.meta.env.VITE_BACKEND_URL}/api/user/my_pokemon`,
         {
           headers: {
-            authorization: window.localStorage.getItem("token"),
+            authorization: window.localStorage.getItem("auth_token"),
           },
         }
       );
@@ -72,7 +72,7 @@ const User = ({ user, logout }) => {
       },
       {
         headers: {
-          authorization: window.localStorage.getItem("token"),
+          authorization: window.localStorage.getItem("auth_token"),
         },
       }
     );
@@ -113,7 +113,7 @@ function App() {
 
   useEffect(() => {
     const possiblyLogin = async () => {
-      const token = window.localStorage.getItem("token");
+      const token = window.localStorage.getItem("auth_token");
 
       if (token) {
         const userResponse = await axios.get(
@@ -148,7 +148,7 @@ function App() {
 
       const token = response.data;
 
-      window.localStorage.setItem("token", token);
+      window.localStorage.setItem("auth_token", token);
 
       const userResponse = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
@@ -184,7 +184,7 @@ function App() {
 
       const token = response.data;
 
-      window.localStorage.setItem("token", token);
+      window.localStorage.setItem("auth_token", token);
 
       const userResponse = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
@@ -206,7 +206,7 @@ function App() {
   };
 
   const logout = () => {
-    window.localStorage.removeItem("token");
+    window.localStorage.removeItem("auth_token");
 
     setUser(null);
 
